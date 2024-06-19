@@ -9,3 +9,4 @@
 2. Run ```composer install ``` to install all project dependencies
 3. Specify your DB config in config/dp.php
 4. Run ```php yii migrate/up``` to set up all project migrations
+5. Run ```php yii admin-seeder/seed``` to create admin user for project 
