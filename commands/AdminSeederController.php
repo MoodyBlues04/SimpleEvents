@@ -27,6 +27,7 @@ class AdminSeederController extends Controller
             'email' => 'admin@admin.com',
             'password' => \Yii::$app->security->generatePasswordHash('123456'),
             'email_verified_at' => date('Y-m-d H:i:s'),
+            'is_admin' => true,
         ]);
     }
 }

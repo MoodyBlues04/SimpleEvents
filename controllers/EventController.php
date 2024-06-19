@@ -3,21 +3,18 @@
 namespace app\controllers;
 
 use app\repositories\EventRepository;
-use app\repositories\OrganiserRepository;
+use app\helpers\IsAdmin;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
-class IndexController extends Controller
+class EventController extends Controller
 {
     private EventRepository $eventRepository;
-    private OrganiserRepository $organiserRepository;
 
     public function __construct($id, $module, $config = [])
     {
         parent::__construct($id, $module, $config);
-
         $this->eventRepository = new EventRepository();
-        $this->organiserRepository = new OrganiserRepository();
     }
 
     public function behaviors(): array
@@ -25,12 +22,15 @@ class IndexController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['index'],
+                'only' => ['index', 'create', 'update', 'delete'],
                 'rules' => [
                     [
-                        'actions' => ['index'],
+                        'actions' => ['index', 'create', 'update', 'delete'],
                         'allow' => true,
-                        'roles' => ['@'],
+//                        too small project for rbac
+                        'matchCallback' => function ($rule, $action) {
+                            return IsAdmin::check();
+                        }
                     ],
                 ],
             ],
@@ -40,8 +40,6 @@ class IndexController extends Controller
     public function actionIndex(): string
     {
         $events = $this->eventRepository->getAll();
-        $organisers = $this->organiserRepository->getAll();
-
-        return $this->render('index', compact('events', 'organisers'));
+        return $this->render('index', compact('events'));
     }
 }

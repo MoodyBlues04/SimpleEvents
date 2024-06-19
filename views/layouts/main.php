@@ -48,10 +48,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
-    echo Nav::widget([
+
+    $data = [
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/index/index']],
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/auth/login']]
                 : '<li class="nav-item">'
@@ -61,9 +61,17 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     ['class' => 'nav-link btn btn-link logout']
                 )
                 . Html::endForm()
-                . '</li>'
+                . '</li>',
+            ['label' => 'Home', 'url' => ['/index/index']],
         ]
-    ]);
+    ];
+
+    if (\app\helpers\IsAdmin::check()) {
+        $data['items'][]= ['label' => 'Events', 'url' => ['/event/index']];
+        $data['items'][]= ['label' => 'Organisers', 'url' => ['/organiser/index']];
+    }
+
+    echo Nav::widget($data);
     NavBar::end();
     ?>
 </header>

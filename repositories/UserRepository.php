@@ -3,7 +3,6 @@
 namespace app\repositories;
 
 use app\models\User;
-use yii\db\ActiveQuery;
 
 class UserRepository extends Repository
 {
