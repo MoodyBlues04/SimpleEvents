@@ -34,12 +34,12 @@ class Repository
         return $this->getBy($conditions)->all();
     }
 
-    public function getOneBy(array $conditions): ActiveRecord
+    public function getOneBy(array $conditions): ?ActiveRecord
     {
         return $this->getBy($conditions)->one();
     }
 
-    public function getBy(array $conditions): ActiveQuery
+    public function getBy(array $conditions): ?ActiveQuery
     {
         return $this->query->where($conditions);
     }
@@ -47,12 +47,12 @@ class Repository
     /**
      * @throws Exception
      */
-    public function create(array $properties): bool
+    public function create(array $properties): ?ActiveRecord
     {
         $cls = $this->query->modelClass;
 
         /** @var ActiveRecord $model */
         $model = new $cls($properties);
-        return $model->save();
+        return $model->save() ? $model : null;
     }
 }
