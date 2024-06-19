@@ -10,7 +10,7 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $fio
  * @property string $email
- * @property string $phone
+ * @property string|null $phone
  *
  * @property Event[] $events
  */
