@@ -2,13 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\Event;
+use app\models\Organiser;
 use Yii;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends Controller
 {
@@ -58,10 +59,15 @@ class SiteController extends Controller
      * Displays homepage.
      *
      * @return string
+     * @throws Exception
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $org = Organiser::find()->where(['id' => 1])->one();
+        $event = Event::find()->where(['id' => 1])->one();
+        $org->link('events', $event);
+        var_dump($org->events);
+        exit;
     }
 
     /**
