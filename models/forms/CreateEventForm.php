@@ -20,8 +20,8 @@ class CreateEventForm extends Model
     {
         return [
             [['name', 'date', 'organisers'], 'required'],
-            ['id', 'integer'],
-//            ['organisers', 'array'],
+            [['id'], 'integer'],
+            [['organisers'], 'validateOrganisers'],
             [['name', 'description', 'date'], 'string'],
             [['date'], 'date', 'format' => 'php:Y-m-d']
         ];
@@ -37,19 +37,50 @@ class CreateEventForm extends Model
             'date' => $this->date,
             'description' => $this->description
         ]);
-        foreach ($this->organisers as $organiserId) {
-            // todo validate in rules (like in login)
-            $event->link('organisers', Organiser::findOne($organiserId)); // TODO check
+
+        if (!$event->save()) {
+            return null;
         }
-        return $event->save() ? $event : null;
+
+        foreach ($this->organisers as $organiserId) {
+            $event->link('organisers', Organiser::findOne($organiserId));
+        }
+        return $event;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function update(): bool|int
     {
-        return false;
-//        $event = Event::findOne($this->id);
-//        $event->name = $this->name;
-//        $event->description = $this->description;
-//        return $event->update();
+        $event = Event::findOne($this->id);
+        if (is_null($event)) {
+            throw new \Exception('Incorrect event id');
+        }
+
+        $event->name = $this->name;
+        $event->date = $this->date;
+        $event->description = $this->description;
+
+        $event->unlinkAll('organisers', true);
+        foreach ($this->organisers as $organiserId) {
+            $event->link('organisers', Organiser::findOne($organiserId));
+        }
+
+        return $event->update();
+    }
+
+    public function validateOrganisers(): void
+    {
+        if ($this->hasErrors()) {
+            return;
+        }
+
+        foreach ($this->organisers as $organiserId) {
+            if (is_null(Organiser::findOne($organiserId))) {
+                $this->addError('organisers', "Incorrect organiser id: $organiserId.");
+                return;
+            }
+        }
     }
 }

@@ -3,8 +3,12 @@
 namespace app\controllers;
 
 use app\models\forms\CreateEventForm;
+use app\models\forms\CreateOrganiserForm;
 use app\repositories\EventRepository;
 use app\helpers\IsAdmin;
+use app\repositories\OrganiserRepository;
+use yii\db\Exception;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Request;
@@ -14,6 +18,7 @@ use yii\web\Session;
 class EventController extends Controller
 {
     private EventRepository $eventRepository;
+    private OrganiserRepository $organiserRepository;
     private Session $session;
 
     public function __construct($id, $module, $config = [])
@@ -21,6 +26,7 @@ class EventController extends Controller
         parent::__construct($id, $module, $config);
 
         $this->eventRepository = new EventRepository();
+        $this->organiserRepository = new OrganiserRepository();
         $this->session = \Yii::$app->getSession();
     }
 
@@ -50,16 +56,9 @@ class EventController extends Controller
         return $this->render('index', compact('events'));
     }
 
-    public function actionShow(): string
-    {
-        $eventId = $this->request->get('id');
-        $event = $this->eventRepository->getOneBy(['id' => $eventId]);
-        if (is_null($event)) {
-            $this->session->setFlash('error', 'Incorrect event id');
-        }
-        return $this->render('show', compact('event'));
-    }
-
+    /**
+     * @throws Exception
+     */
     public function actionCreate(): string|Response
     {
         if ($this->request->isPost) {
@@ -69,16 +68,47 @@ class EventController extends Controller
             }
             return $this->redirect('/event/index');
         }
-        return $this->render('create');
+        $organisers = $this->organiserRepository->getAll();
+        return $this->render('create', compact('organisers'));
     }
 
-    public function actionUpdate()
+    /**
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function actionUpdate(): Response|string
     {
+        if ($this->request->isPost) {
+            $form = new CreateEventForm();
+            if ($form->load($this->request->post(), '') && $form->update()) {
+                $this->session->setFlash('success', 'Event updated');
+            }
+            return $this->redirect('/event/index');
+        }
 
+        $eventId = $this->request->get('id');
+        $event = $this->eventRepository->getOneBy(['id' => $eventId]);
+        if (is_null($event)) {
+            $this->session->setFlash('error', 'Incorrect event id');
+            return $this->redirect('/event/index');
+        }
+
+        $organisers = $this->organiserRepository->getAll();
+        return $this->render('update', compact('event', 'organisers'));
     }
 
-    public function actionDelete()
+    /**
+     * @throws StaleObjectException
+     * @throws \Throwable
+     */
+    public function actionDelete(): Response
     {
-
+        $eventId = $this->request->get('id');
+        $event = $this->eventRepository->getOneBy(['id' => $eventId]);
+        if (is_null($event)) {
+            throw new \Exception('Incorrect event id');
+        }
+        $event->delete();
+        return $this->redirect('/event/index');
     }
 }
