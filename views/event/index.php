@@ -25,7 +25,7 @@
                 <td><?= $event->name ?></td>
                 <td><?= $event->date ?></td>
                 <td><?= $event->description ?></td>
-                <td><?= json_encode($event->mapOrganisers(fn ($organiser) => $organiser->fio)) ?></td>
+                <td><?= json_encode($event->mapOrganisers(fn ($organiser) => $organiser->fio), JSON_UNESCAPED_UNICODE) ?></td>
                 <td>
                     <a href="/event/update?id=<?=$event->id?>" class="btn btn-primary">Edit</a>
                     <a href="/event/delete?id=<?=$event->id?>" class="btn btn-danger" >Delete</a>

@@ -37,6 +37,18 @@ class IndexController extends Controller
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function actions(): array
+    {
+        return [
+            'error' => [
+                'class' => 'yii\web\ErrorAction',
+            ],
+        ];
+    }
+
     public function actionIndex(): string
     {
         $events = $this->eventRepository->getAll();

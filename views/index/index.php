@@ -24,7 +24,7 @@
                 <td><?= $event->name ?></td>
                 <td><?= $event->date ?></td>
                 <td><?= $event->description ?></td>
-                <td><?= json_encode($event->organisers, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?></td>
+                <td><?= json_encode($event->mapOrganisers(fn ($organiser) => $organiser->fio), JSON_UNESCAPED_UNICODE) ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

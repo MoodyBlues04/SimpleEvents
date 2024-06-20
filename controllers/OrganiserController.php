@@ -30,10 +30,10 @@ class OrganiserController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['index', 'show', 'create', 'update', 'delete'],
+                'only' => ['index', 'create', 'update', 'delete'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'show', 'create', 'update', 'delete'],
+                        'actions' => ['index', 'create', 'update', 'delete'],
                         'allow' => true,
                         'matchCallback' => function ($rule, $action) {
                             return IsAdmin::check();
@@ -66,7 +66,7 @@ class OrganiserController extends Controller
      * @throws Exception
      * @throws \Throwable
      */
-    public function actionUpdate()
+    public function actionUpdate(): Response|string
     {
         if ($this->request->isPost) {
             $form = new CreateOrganiserForm();
